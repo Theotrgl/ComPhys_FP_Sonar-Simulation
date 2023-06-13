@@ -26,9 +26,6 @@ tile_size=50
 game_over=0
 main_menu=True
 
-
-
-
 #Images
 bg_img= pygame.image.load('Img/bg.jpg')
 restart_img=pygame.image.load("Img/restart.png")
@@ -204,7 +201,7 @@ class Player():
         self.counter=0
         #Adding walk animation keyframes into lists which is itterated and drawn onto screen in the main game loop
         for num in range(1,5):
-            img_right=pygame.image.load(f'Img/charaR{num}.1.png')
+            img_right=pygame.image.load('Img/Boat.png')
             img_right=pygame.transform.scale(img_right,(30,40))
             img_left=pygame.transform.flip(img_right,True,False)
             self.images_right.append(img_right)

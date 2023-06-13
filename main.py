@@ -19,7 +19,7 @@ class Sonar:
 
 screen = pygame.display.set_mode((700,700))
 pygame.display.set_caption("SONAR Simulator")
-sonar_sound = pygame.mixer.Sound("SFX/sonar_sound.mp3")
+# sonar_sound = pygame.mixer.Sound("SFX/sonar_sound.mp3")
 bg_music = pygame.mixer.Sound("SFX/menu.mp3")
 boat_R=pygame.image.load("img/boat-r.png")
 boat_L=pygame.transform.flip(boat_R,True,False)
@@ -90,7 +90,7 @@ while (run):
     if keys[pygame.K_SPACE]:
         pulse = Sonar(x+boat_R.get_rect().size[0]/2, y+boat_R.get_rect().size[1]/2,2)
         pulse.deployed=True
-        pygame.mixer.Sound(sonar_sound)
+        # pygame.mixer.Sound(sonar_sound)
         walkCount = 0
 
     redrawGameWindow()
