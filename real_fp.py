@@ -9,17 +9,44 @@ screen_width=900
 screen_height=600
 screen=pygame.display.set_mode((screen_width,screen_height))
 tile_size=50
+main_menu = True
 
 bg=pygame.image.load("img/bg.jpg")
 bg=pygame.transform.scale(bg,(900,600))
 char=pygame.image.load("img/Boat.png")
+start_img=pygame.image.load('Img/start.png')
+start_img=pygame.transform.scale(start_img,(200,100))
+Title=pygame.image.load("Img/Title.png")
+Title=pygame.transform.scale(Title,(600,200))
 
 
 def draw_grid():
 	for line in range(0, 20):
 		pygame.draw.line(screen, (255, 255, 255), (0, line * tile_size), (screen_width, line * tile_size))
 		pygame.draw.line(screen, (255, 255, 255), (line * tile_size, 0), (line * tile_size, screen_height))
+                
+class Button():
+    def __init__(self,x,y,image):
+        self.image= image
+        self.rect=self.image.get_rect()
+        self.rect.x=x
+        self.rect.y=y
+        self.clicked=False
+    #To draw buttons onto game screen
+    def draw(self):
+        action=False
+        pos=pygame.mouse.get_pos()
+        #Setting collision points between mouse cursor and button area
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0]==True and self.clicked==False:
+                action=True
+                self.clicked=True
 
+        if pygame.mouse.get_pressed()[0]==False:
+            self.clicked=False
+        screen.blit(self.image,self.rect)
+        return action
+    
 class Sonar:
     def __init__(self,x,y,size):
         self.x=x
@@ -35,6 +62,7 @@ class Sonar:
                 tile_index = world.tile_list.index(tile)
                 if not tile[2]:  # Check if the block is visible
                     world.tile_list[tile_index] = (tile[0], tile[1], True)  # Set block visibility to True
+
 
 x=50
 y=425
@@ -89,21 +117,18 @@ class Player():
                     self.image=self.images_left[self.index]
                 
             #Adding Gravity           
-            self.vel_y+=1
-            if self.vel_y>20:
-                self.vel_y=20
-            dy+=self.vel_y
-            self.in_air=True
+            # self.vel_y+=1
+            # if self.vel_y>20:
+            #     self.vel_y=20
+            # dy+=self.vel_y
+            # self.in_air=True
 
             #Adding collision for blocks in world data
             for tile in world.tile_list:
                 if tile[1].colliderect(self.rect.x+dx,self.rect.y,self.width,self.height):
                     dx=0
                 if tile[1].colliderect(self.rect.x,self.rect.y+dy,self.width,self.height):
-                    if self.vel_y<0:
-                        dy=tile[1].bottom-self.rect.top
-                        self.vel_y=0
-                    elif self.vel_y>=0:
+                    if self.vel_y>=0:
                         dy=tile[1].top-self.rect.bottom
                         self.vel_y=0
                         self.in_air=False
@@ -121,11 +146,6 @@ class Player():
                     self.pulse.y = self.rect.y + self.height // 2
                     self.pulse.size += 2
                     self.pulse.display()
-
-        #Death Animation
-        elif game_over==-1:
-            self.image=self.dead_image
-            self.rect.y-=2
 
         if self.pulse:
                 if self.pulse.deployed:
@@ -149,16 +169,13 @@ class Player():
             self.images_left.append(img_left)
         self.image=self.images_right[self.index]
         self.rect=self.image.get_rect()
-        self.dead_image=pygame.image.load('Img/dead.png')
-        self.dead_image=pygame.transform.scale(self.dead_image,(30,40)) 
         self.rect.x=x
         self.rect.y=y
         self.width=self.image.get_width()
         self.height=self.image.get_height()
         self.vel_y=0
-        self.jumped=False
         self.direction=0
-        self.in_air=True
+
 
        
 class World():
@@ -201,6 +218,7 @@ def reset_game(player, world):
     return 0  # Set game_over to 0 indicating the game is not over
 
 player=Player(screen_width//2,screen_height - 450)
+start_button=Button(screen_width//2-110,screen_height//2+60,start_img)
 world_data=level_1
 world=World(world_data)
 game_over=0
@@ -208,11 +226,17 @@ run=True
 while (run==True):
     clock.tick(fps)
     screen.blit(bg,(0,0))
-    world.draw()
-    draw_grid()
-    if player.pulse:  # Check if pulse object exists
-        player.pulse.display()
-    game_over=player.update(game_over)
+    if main_menu==True:
+        screen.blit(Title,(screen_width//2-300,screen_height//2-160))
+        #Displaying button to main menu screen
+        if start_button.draw():
+            main_menu=False
+    else:
+        world.draw()
+        # draw_grid()
+        if player.pulse:  # Check if pulse object exists
+            player.pulse.display()
+        game_over=player.update(game_over)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
