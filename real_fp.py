@@ -1,6 +1,8 @@
 import pygame
 import pickle
 from os import path
+from pygame import mixer
+
 
 pygame.init()
 
@@ -20,6 +22,12 @@ start_img=pygame.image.load('Img/start.png')
 start_img=pygame.transform.scale(start_img,(200,100))
 Title=pygame.image.load("Img/Title.png")
 Title=pygame.transform.scale(Title,(600,200))
+
+pygame.mixer.music.load("SFX/ocean_sound.mp3")
+pygame.mixer.music.play(-1,0.0,5000)
+sonar_sound = pygame.mixer.Sound("SFX/sonar_sound.mp3")
+sonar_sound.set_volume(0.2)
+
 
 
 def draw_grid():
@@ -86,9 +94,9 @@ class Player():
             #Adding keypresses for movement using pygame function
             key=pygame.key.get_pressed()
             if key[pygame.K_SPACE] and self.pulse_cooldown == 0:
+                pygame.mixer.Sound(sonar_sound)
                 self.pulse = Sonar(self.rect.x + self.width // 2, self.rect.y + self.height // 2, 2)
                 self.pulse.deployed = True
-                # pygame.mixer.Sound(sonar_sound)
                 self.pulse_cooldown = self.pulse_cooldown_max
             if key[pygame.K_a]:
                 dx -= 2
@@ -230,6 +238,14 @@ class World():
                     img=pygame.transform.scale(Sand,(tile_size//18,tile_size))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False)
+                    self.tile_list.append(tile)
+                if tile == 7:
+                    img=pygame.transform.scale(Sand,(tile_size//18,tile_size))
+                    img = pygame.transform.flip(img, True, False)
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size + 48
                     img_rect.y=row_counter*tile_size
                     tile=(img,img_rect, False)
                     self.tile_list.append(tile)

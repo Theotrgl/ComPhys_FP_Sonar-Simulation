@@ -22,8 +22,8 @@ pygame.display.set_caption('Level Editor')
 #load images
 bg = pygame.image.load('img/bg.jpg')
 bg = pygame.transform.scale(bg,(900,600))
-Sand= pygame.image.load('Img/pixel-platformer-blocks/Tiles/Sand/tile_0025.png')
-Stone = pygame.image.load('Img/pixel-platformer-blocks/Tiles/Stone/tile_0010.png')
+Sand= pygame.image.load('Img/sand.png')
+Stone = pygame.image.load('Img/stone.png')
 save_img = pygame.image.load('img/save_btn.png')
 load_img = pygame.image.load('img/load_btn.png')
 
