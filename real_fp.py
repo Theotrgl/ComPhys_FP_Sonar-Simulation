@@ -1,5 +1,6 @@
 import pygame
-from level import level_1
+import pickle
+from os import path
 
 pygame.init()
 
@@ -9,6 +10,7 @@ screen_width=900
 screen_height=600
 screen=pygame.display.set_mode((screen_width,screen_height))
 tile_size=50
+level=1
 main_menu = True
 
 bg=pygame.image.load("img/bg.jpg")
@@ -116,12 +118,12 @@ class Player():
                 if self.direction== -1:
                     self.image=self.images_left[self.index]
                 
-            #Adding Gravity           
-            # self.vel_y+=1
-            # if self.vel_y>20:
-            #     self.vel_y=20
-            # dy+=self.vel_y
-            # self.in_air=True
+            # Adding Gravity           
+            self.vel_y+=1
+            if self.vel_y>20:
+                self.vel_y=20
+            dy+=self.vel_y
+            self.in_air=True
 
             #Adding collision for blocks in world data
             for tile in world.tile_list:
@@ -182,21 +184,50 @@ class World():
     def __init__(self,data):
         self.tile_list=[]
 
-        floor_img= pygame.image.load('Img/pixel-platformer-blocks/Tiles/Sand/tile_0025.png')
+        Sand = pygame.image.load('Img/sand.png')
+        Stone = pygame.image.load('Img/stone.png')
         row_counter = 0
 
         for row in data:
             column_counter=0
             for tile in row:
                 if tile == 1:
-                    img=pygame.transform.scale(floor_img,(tile_size,tile_size))
+                    img=pygame.transform.scale(Sand,(tile_size,tile_size))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
                     tile=(img,img_rect, False)
                     self.tile_list.append(tile)
                 if tile == 2:
-                    img=pygame.transform.scale(floor_img,(tile_size,tile_size//18))
+                    img=pygame.transform.scale(Stone,(tile_size,tile_size))
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False)
+                    self.tile_list.append(tile)
+                if tile == 3:
+                    img=pygame.transform.scale(Sand,(tile_size//2,tile_size//2))
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False)
+                    self.tile_list.append(tile)
+                if tile == 4:
+                    img=pygame.transform.scale(Stone,(tile_size//2,tile_size//2))
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False)
+                    self.tile_list.append(tile)
+                if tile == 5:
+                    img=pygame.transform.scale(Sand,(tile_size,tile_size//18))
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False)
+                    self.tile_list.append(tile)
+                if tile == 6:
+                    img=pygame.transform.scale(Sand,(tile_size//18,tile_size))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
@@ -219,8 +250,12 @@ def reset_game(player, world):
 
 player=Player(screen_width//2,screen_height - 450)
 start_button=Button(screen_width//2-110,screen_height//2+60,start_img)
-world_data=level_1
+
+if path.exists(f'level{level}_data'):
+	pickle_in = open(f'level{level}_data', 'rb')
+	world_data = pickle.load(pickle_in)
 world=World(world_data)
+
 game_over=0
 run=True
 while (run==True):
