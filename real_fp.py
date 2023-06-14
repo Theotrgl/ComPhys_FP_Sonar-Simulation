@@ -70,9 +70,9 @@ class Sonar:
         for tile in world.tile_list:
             if tile[1].colliderect(self.x - self.size, self.y - self.size, self.size * 2, self.size * 2):
                 tile_index = world.tile_list.index(tile)
-                if not tile[2]:  # Check if the block is visible
+                if not tile[2] and tile[3] :  # Check if the block is visible and changable
                     world.tile_list[tile_index] = (tile[0], tile[1], True)  # Set block visibility to True
-
+            
 
 x=50
 y=425
@@ -204,42 +204,42 @@ class World():
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, True)
                     self.tile_list.append(tile)
                 if tile == 2:
                     img=pygame.transform.scale(Stone,(tile_size,tile_size))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, True)
                     self.tile_list.append(tile)
                 if tile == 3:
                     img=pygame.transform.scale(Sand,(tile_size//2,tile_size//2))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, True)
                     self.tile_list.append(tile)
                 if tile == 4:
                     img=pygame.transform.scale(Stone,(tile_size//2,tile_size//2))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, True)
                     self.tile_list.append(tile)
                 if tile == 5:
                     img=pygame.transform.scale(Sand,(tile_size,tile_size//18))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, False)
                     self.tile_list.append(tile)
                 if tile == 6:
                     img=pygame.transform.scale(Sand,(tile_size//18,tile_size))
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, False)
                     self.tile_list.append(tile)
                 if tile == 7:
                     img=pygame.transform.scale(Sand,(tile_size//18,tile_size))
@@ -247,7 +247,7 @@ class World():
                     img_rect=img.get_rect()
                     img_rect.x=column_counter*tile_size + 48
                     img_rect.y=row_counter*tile_size
-                    tile=(img,img_rect, False)
+                    tile=(img,img_rect, False, False)
                     self.tile_list.append(tile)
                 column_counter+=1
             row_counter+=1
