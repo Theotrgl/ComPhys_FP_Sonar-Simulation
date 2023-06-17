@@ -346,7 +346,7 @@ while (run==True):
             run_level_editor()
     else:
         world.draw()
-        draw_grid()
+        # draw_grid()
         screen.blit(depth0,depth0_rect)
         screen.blit(depth1,depth1_rect)
         screen.blit(depth2,depth2_rect)
