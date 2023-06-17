@@ -22,6 +22,9 @@ input_rect = pygame.Rect(10, 20, 10, 20)
 rate = 2
 input_active = False
 rate_input = ""
+maxSize = 200
+input_active2 = False
+freq_input = ""
 
 bg=pygame.image.load("img/bg.png")
 bg=pygame.transform.scale(bg,(900,900))
@@ -206,7 +209,8 @@ class Player():
                 if self.pulse.deployed:
                     self.pulse.x = self.rect.x + self.width // 2
                     self.pulse.y = self.rect.y + self.height // 2
-                    self.pulse.size += rate
+                    if self.pulse.size < maxSize:  # Check if pulse size is within the limit
+                        self.pulse.size += rate
                     self.pulse.display()
 
 
@@ -360,7 +364,11 @@ while (run==True):
     input_surface = font.render("Rate: " + rate_input, True, (255, 255, 255))
     input_rect = input_surface.get_rect()
     input_rect.topleft = (10, 10)
+    freq_surface = font.render("Frequency: " + freq_input, True, (255, 255, 255))
+    freq_rect = freq_surface.get_rect()
+    freq_rect.topleft = (100, 10)
     screen.blit(input_surface, input_rect)
+    screen.blit(freq_surface, freq_rect)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -370,22 +378,39 @@ while (run==True):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check if the mouse click occurred within the input field
             if input_rect.collidepoint(event.pos):
-                input_active = True
+                input_active1 = True
+                input_active2 = False  # Deactivate the other input field
             else:
                 input_active = False
+            if freq_rect.collidepoint(event.pos):
+                input_active2 = True
+                input_active = False  # Deactivate the other input field
+            else:
+                input_active2 = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_RETURN:
-                # Extract the numeric value from the input string using regular expressions
-                rate_match = re.search(r'\d+', rate_input)
-                if rate_match:
-                    rate = int(rate_match.group())
-                rate_input = ""
-                input_active = False
-            elif event.key == pygame.K_BACKSPACE:
-                rate_input = rate_input[:-1]
+                if input_active:
+                    rate_match = re.search(r'\d+', rate_input)
+                    if rate_match:
+                        rate = int(rate_match.group())
+                    rate_input = ""
+                    input_active = False
+                if input_active2:
+                    freq_match = re.search(r'\d+', freq_input)
+                    if freq_match:
+                        maxSize = int(freq_match.group())
+                    freq_input = ""
+                    input_active2 = False
+            if event.key == pygame.K_BACKSPACE:
+                if input_active:
+                    rate_input = rate_input[:-1]
+                elif input_active2:
+                    freq_input = freq_input[:-1]
             else:
                 if input_active and event.unicode.isdigit():
                     rate_input += event.unicode
+                elif input_active2 and event.unicode.isdigit():
+                    freq_input += event.unicode
         
 
     # To enable screen refresh so that everything will be visible
