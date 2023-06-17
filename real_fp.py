@@ -1,7 +1,11 @@
 import pygame
 import pickle
+import subprocess
+import pygame.font
+import re
 from os import path
 from pygame import mixer
+
 
 
 pygame.init()
@@ -14,6 +18,10 @@ screen=pygame.display.set_mode((screen_width,screen_height))
 tile_size=50
 level=1
 main_menu = True
+input_rect = pygame.Rect(10, 20, 10, 20)
+rate = 2
+input_active = False
+rate_input = ""
 
 bg=pygame.image.load("img/bg.jpg")
 bg=pygame.transform.scale(bg,(900,600))
@@ -22,6 +30,7 @@ start_img=pygame.image.load('Img/start.png')
 start_img=pygame.transform.scale(start_img,(200,100))
 Title=pygame.image.load("Img/Title.png")
 Title=pygame.transform.scale(Title,(600,200))
+font = pygame.font.Font(None, 24)
 
 pygame.mixer.music.load("SFX/ocean_sound.mp3")
 pygame.mixer.music.play(-1,0.0,5000)
@@ -65,13 +74,21 @@ class Sonar:
         self.color=(255,255,255)
         self.thickness=1
         self.deployed=False
+        self.start_time = 0 
     def display(self):
+        current_time = pygame.time.get_ticks()
+        elapsed_time = current_time - self.start_time
         pygame.draw.circle(screen, self.color, (self.x, self.y), self.size, self.thickness)
         for tile in world.tile_list:
             if tile[1].colliderect(self.x - self.size, self.y - self.size, self.size * 2, self.size * 2):
                 tile_index = world.tile_list.index(tile)
-                if not tile[2] and tile[3] :  # Check if the block is visible and changable
-                    world.tile_list[tile_index] = (tile[0], tile[1], True)  # Set block visibility to True
+                if not tile[2] and tile[3]:  # Check if the block is visible and changeable
+                    world.tile_list[tile_index] = (tile[0], tile[1], True, elapsed_time)  # Set block visibility and elapsed time
+            if tile[2]:  # Check if the block is visible
+                elapsed_time_text = str(tile[3] // 1000) + "s"  # Convert elapsed time to seconds and create text
+                text_surface = pygame.font.Font(None, 20).render(elapsed_time_text, True, (255, 255, 255))
+                text_rect = text_surface.get_rect(center=tile[1].center)
+                screen.blit(text_surface, text_rect)
             
 
 x=50
@@ -94,10 +111,11 @@ class Player():
             #Adding keypresses for movement using pygame function
             key=pygame.key.get_pressed()
             if key[pygame.K_SPACE] and self.pulse_cooldown == 0:
-                pygame.mixer.Sound(sonar_sound)
+                sonar_sound.play()
                 self.pulse = Sonar(self.rect.x + self.width // 2, self.rect.y + self.height // 2, 2)
                 self.pulse.deployed = True
                 self.pulse_cooldown = self.pulse_cooldown_max
+                self.pulse.start_time = pygame.time.get_ticks()
             if key[pygame.K_a]:
                 dx -= 2
                 self.direction=-1
@@ -154,13 +172,9 @@ class Player():
                 if self.pulse.deployed:
                     self.pulse.x = self.rect.x + self.width // 2
                     self.pulse.y = self.rect.y + self.height // 2
-                    self.pulse.size += 2
+                    self.pulse.size += rate
                     self.pulse.display()
 
-        if self.pulse:
-                if self.pulse.deployed:
-                    self.pulse.size += 2
-                    self.pulse.display()
 
         screen.blit(self.image,self.rect)
         return game_over
@@ -260,13 +274,21 @@ class World():
 def reset_game(player, world):
     player.reset(screen_width // 2, screen_height - 450)
     for index, tile in enumerate(world.tile_list):
-        world.tile_list[index] = (tile[0], tile[1], False)  # Reset block visibility to False
+        if len(tile) >= 3:  # Check if tile has enough elements
+            visibility = tile[2]
+            changeability = tile[3] if len(tile) >= 4 else True
+            if changeability:
+                visibility = False  # Reset block visibility
+            world.tile_list[index] = (tile[0], tile[1], visibility, changeability)
     player.pulse = None  # Reset the pulse object
     return 0  # Set game_over to 0 indicating the game is not over
 
-player=Player(screen_width//2,screen_height - 450)
-start_button=Button(screen_width//2-110,screen_height//2+60,start_img)
+def run_level_editor():
+    subprocess.run(['python', 'level_editor.py'])
 
+player=Player(screen_width//2,screen_height - 450)
+start_button=Button(screen_width//2+80,screen_height//2+60,start_img)
+level_editor=Button(screen_width//2-300,screen_height//2+60,start_img)
 if path.exists(f'level{level}_data'):
 	pickle_in = open(f'level{level}_data', 'rb')
 	world_data = pickle.load(pickle_in)
@@ -282,19 +304,46 @@ while (run==True):
         #Displaying button to main menu screen
         if start_button.draw():
             main_menu=False
+        if level_editor.draw():
+            run_level_editor()
     else:
         world.draw()
-        # draw_grid()
+        draw_grid()
         if player.pulse:  # Check if pulse object exists
             player.pulse.display()
         game_over=player.update(game_over)
 
+    input_surface = font.render("Rate: " + rate_input, True, (255, 255, 255))
+    input_rect = input_surface.get_rect()
+    input_rect.topleft = (10, 10)
+    screen.blit(input_surface, input_rect)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 game_over = reset_game(player, world)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # Check if the mouse click occurred within the input field
+            if input_rect.collidepoint(event.pos):
+                input_active = True
+            else:
+                input_active = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                # Extract the numeric value from the input string using regular expressions
+                rate_match = re.search(r'\d+', rate_input)
+                if rate_match:
+                    rate = int(rate_match.group())
+                rate_input = ""
+                input_active = False
+            elif event.key == pygame.K_BACKSPACE:
+                rate_input = rate_input[:-1]
+            else:
+                if input_active and event.unicode.isdigit():
+                    rate_input += event.unicode
+        
+
     # To enable screen refresh so that everything will be visible
     pygame.display.update()
 
