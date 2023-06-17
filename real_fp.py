@@ -23,14 +23,48 @@ rate = 2
 input_active = False
 rate_input = ""
 
-bg=pygame.image.load("img/bg.jpg")
-bg=pygame.transform.scale(bg,(900,600))
+bg=pygame.image.load("img/bg.png")
+bg=pygame.transform.scale(bg,(900,900))
 char=pygame.image.load("img/Boat.png")
 start_img=pygame.image.load('Img/start.png')
-start_img=pygame.transform.scale(start_img,(200,100))
+start_img=pygame.transform.scale(start_img,(300,300))
+editor_img=pygame.image.load('Img/editor.png')
+editor_img=pygame.transform.scale(editor_img,(380,380))
 Title=pygame.image.load("Img/Title.png")
 Title=pygame.transform.scale(Title,(600,200))
 font = pygame.font.Font(None, 24)
+
+depth0 = font.render("0m", True, (255, 255, 255))
+depth0_rect = depth0.get_rect()
+depth0_rect.topright = (900,151)
+depth1 = font.render("50m", True, (255, 255, 255))
+depth1_rect = depth1.get_rect()
+depth1_rect.topright = (900,201)
+depth2 = font.render("100m", True, (255, 255, 255))
+depth2_rect = depth2.get_rect()
+depth2_rect.topright = (900,251)
+depth3 = font.render("150m", True, (255, 255, 255))
+depth3_rect = depth3.get_rect()
+depth3_rect.topright = (900,301)
+depth4 = font.render("200m", True, (255, 255, 255))
+depth4_rect = depth4.get_rect()
+depth4_rect.topright = (900,351)
+depth5 = font.render("250m", True, (255, 255, 255))
+depth5_rect = depth5.get_rect()
+depth5_rect.topright = (900,401)
+depth6 = font.render("300m", True, (255, 255, 255))
+depth6_rect = depth6.get_rect()
+depth6_rect.topright = (900,451)
+depth7 = font.render("350m", True, (255, 255, 255))
+depth7_rect = depth7.get_rect()
+depth7_rect.topright = (900,501)
+depth8 = font.render("400m", True, (255, 255, 255))
+depth8_rect = depth8.get_rect()
+depth8_rect.topright = (900,551)
+depth9 = font.render("450m", True, (255, 255, 255))
+depth9_rect = depth9.get_rect()
+depth9_rect.topright = (900,601)
+
 
 pygame.mixer.music.load("SFX/ocean_sound.mp3")
 pygame.mixer.music.play(-1,0.0,5000)
@@ -287,8 +321,8 @@ def run_level_editor():
     subprocess.run(['python', 'level_editor.py'])
 
 player=Player(screen_width//2,screen_height - 450)
-start_button=Button(screen_width//2+80,screen_height//2+60,start_img)
-level_editor=Button(screen_width//2-300,screen_height//2+60,start_img)
+start_button=Button(screen_width//2+60,screen_height//2+30,start_img)
+level_editor=Button(screen_width//2-400,screen_height//2-18,editor_img)
 if path.exists(f'level{level}_data'):
 	pickle_in = open(f'level{level}_data', 'rb')
 	world_data = pickle.load(pickle_in)
@@ -298,9 +332,9 @@ game_over=0
 run=True
 while (run==True):
     clock.tick(fps)
-    screen.blit(bg,(0,0))
+    screen.blit(bg,(0,-255))
     if main_menu==True:
-        screen.blit(Title,(screen_width//2-300,screen_height//2-160))
+        screen.blit(Title,(screen_width//2-300,screen_height//2-200))
         #Displaying button to main menu screen
         if start_button.draw():
             main_menu=False
@@ -309,6 +343,16 @@ while (run==True):
     else:
         world.draw()
         draw_grid()
+        screen.blit(depth0,depth0_rect)
+        screen.blit(depth1,depth1_rect)
+        screen.blit(depth2,depth2_rect)
+        screen.blit(depth3,depth3_rect)
+        screen.blit(depth4,depth4_rect)
+        screen.blit(depth5,depth5_rect)
+        screen.blit(depth6,depth6_rect)
+        screen.blit(depth7,depth7_rect)
+        screen.blit(depth8,depth8_rect)
+        screen.blit(depth9,depth9_rect)
         if player.pulse:  # Check if pulse object exists
             player.pulse.display()
         game_over=player.update(game_over)

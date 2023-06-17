@@ -20,8 +20,8 @@ pygame.display.set_caption('Level Editor')
 
 
 #load images
-bg = pygame.image.load('img/bg.jpg')
-bg = pygame.transform.scale(bg,(900,600))
+bg = pygame.image.load('img/bg.png')
+bg = pygame.transform.scale(bg,(900,900))
 Sand= pygame.image.load('Img/sand.png')
 Stone = pygame.image.load('Img/stone.png')
 save_img = pygame.image.load('img/save_btn.png')
@@ -99,11 +99,6 @@ def draw_world():
 					img = pygame.transform.flip(img,True,False)
 					screen.blit(img, (col * tile_size + 48, row * tile_size))
 					
-					
-
-
-
-
 
 class Button():
 	def __init__(self, x, y, image):
@@ -144,7 +139,7 @@ while run:
 
 	#draw background
 	screen.fill(green)
-	screen.blit(bg, (0, 0))	
+	screen.blit(bg, (0, -255))	
 
 	#load and save level
 	if save_button.draw():
