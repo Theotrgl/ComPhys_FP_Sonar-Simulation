@@ -16,15 +16,16 @@ screen_width=900
 screen_height=600
 screen=pygame.display.set_mode((screen_width,screen_height))
 tile_size=50
-level=1
 main_menu = True
-input_rect = pygame.Rect(10, 20, 10, 20)
 rate = 2
 input_active = False
 rate_input = ""
 maxSize = 200
 input_active2 = False
 freq_input = ""
+level=1
+input_active3 = False
+level_input = ""
 
 bg=pygame.image.load("img/bg.png")
 bg=pygame.transform.scale(bg,(900,900))
@@ -367,8 +368,12 @@ while (run==True):
     freq_surface = font.render("Frequency: " + freq_input, True, (255, 255, 255))
     freq_rect = freq_surface.get_rect()
     freq_rect.topleft = (100, 10)
+    level_surface = font.render("Level: " + level_input, True, (255, 255, 255))
+    level_rect = level_surface.get_rect()
+    level_rect.topleft = (250, 10)
     screen.blit(input_surface, input_rect)
     screen.blit(freq_surface, freq_rect)
+    screen.blit(level_surface, level_rect)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -377,13 +382,21 @@ while (run==True):
             if input_rect.collidepoint(event.pos):
                 input_active  = True
                 input_active2 = False  # Deactivate the other input field
+                input_active3 = False
             else:
                 input_active = False
             if freq_rect.collidepoint(event.pos):
                 input_active2 = True
-                input_active = False  # Deactivate the other input field
+                input_active = False
+                input_active3 = False
             else:
                 input_active2 = False
+            if level_rect.collidepoint(event.pos):
+                input_active3 = True
+                input_active = False  # Deactivate the other input field
+                input_active2 = False
+            else:
+                input_active3 = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_r:
                 game_over = reset_game(player, world)
@@ -400,16 +413,26 @@ while (run==True):
                         maxSize = int(freq_match.group())
                     freq_input = ""
                     input_active2 = False
+                if input_active3:
+                    level_match = re.search(r'\d+', level_input)
+                    if level_match:
+                        level = int(level_match.group())
+                    level_input = ""
+                    input_active3 = False
             if event.key == pygame.K_BACKSPACE:
                 if input_active:
                     rate_input = rate_input[:-1]
                 elif input_active2:
                     freq_input = freq_input[:-1]
+                elif input_active3:
+                    level_input = freq_input[:-1]
             else:
                 if input_active and event.unicode.isdigit():
                     rate_input += event.unicode
                 elif input_active2 and event.unicode.isdigit():
                     freq_input += event.unicode
+                elif input_active3 and event.unicode.isdigit():
+                    level_input += event.unicode
         
 
     # To enable screen refresh so that everything will be visible
