@@ -312,7 +312,7 @@ class World():
 def reset_game(player, world):
     player.reset(screen_width // 2, screen_height - 450)
     for index, tile in enumerate(world.tile_list):
-        if len(tile) >= 3:  # Check if tile has enough elements
+        if len(tile) >= 3:
             visibility = tile[2]
             changeability = tile[3] if len(tile) >= 4 else True
             if changeability:
@@ -372,9 +372,6 @@ while (run==True):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_r:
-                game_over = reset_game(player, world)
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check if the mouse click occurred within the input field
             if input_rect.collidepoint(event.pos):
@@ -388,6 +385,8 @@ while (run==True):
             else:
                 input_active2 = False
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                game_over = reset_game(player, world)
             if event.key == pygame.K_RETURN:
                 if input_active:
                     rate_match = re.search(r'\d+', rate_input)
