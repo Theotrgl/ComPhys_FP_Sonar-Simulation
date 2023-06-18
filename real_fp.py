@@ -375,7 +375,7 @@ while (run==True):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # Check if the mouse click occurred within the input field
             if input_rect.collidepoint(event.pos):
-                input_active1 = True
+                input_active  = True
                 input_active2 = False  # Deactivate the other input field
             else:
                 input_active = False
