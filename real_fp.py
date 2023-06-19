@@ -23,7 +23,7 @@ rate_input = ""
 maxSize = 200
 input_active2 = False
 freq_input = ""
-level=1
+level=3
 input_active3 = False
 level_input = ""
 
@@ -68,6 +68,9 @@ depth8_rect.topright = (900,551)
 depth9 = font.render("450m", True, (255, 255, 255))
 depth9_rect = depth9.get_rect()
 depth9_rect.topright = (900,601)
+inst = font.render("Press 'Esc' to go back to main menu", True, (255,255,255))
+inst_rect = inst.get_rect()
+inst_rect.topright = (890, 10)
 
 
 pygame.mixer.music.load("SFX/ocean_sound.mp3")
@@ -124,7 +127,7 @@ class Sonar:
                     world.tile_list[tile_index] = (tile[0], tile[1], True, elapsed_time)  # Set block visibility and elapsed time
             if tile[2]:  # Check if the block is visible
                 elapsed_time_text = str(tile[3] // 1000) + "s"  # Convert elapsed time to seconds and create text
-                text_surface = pygame.font.Font(None, 20).render(elapsed_time_text, True, (255, 255, 255))
+                text_surface = pygame.font.Font(None, 40).render(elapsed_time_text, True, (255,255,0))
                 text_rect = text_surface.get_rect(center=tile[1].center)
                 screen.blit(text_surface, text_rect)
             
@@ -169,8 +172,6 @@ class Player():
                     self.image=self.images_right[self.index]
                 if self.direction== -1:
                     self.image=self.images_left[self.index]
-            
-            
             #Animation Process
             if self.counter > walk_cooldown:
                 self.counter=0
@@ -247,6 +248,7 @@ class World():
 
         Sand = pygame.image.load('Img/sand.png')
         Stone = pygame.image.load('Img/stone.png')
+        fish1 = pygame.image.load('Img/fishgolden.png')
         row_counter = 0
 
         for row in data:
@@ -301,6 +303,13 @@ class World():
                     img_rect.x=column_counter*tile_size + 48
                     img_rect.y=row_counter*tile_size
                     tile=(img,img_rect, False, False)
+                    self.tile_list.append(tile)
+                if tile == 8:
+                    img=pygame.transform.scale(fish1,(tile_size*2,tile_size*2))
+                    img_rect=img.get_rect()
+                    img_rect.x=column_counter*tile_size
+                    img_rect.y=row_counter*tile_size
+                    tile=(img,img_rect, False, True)
                     self.tile_list.append(tile)
                 column_counter+=1
             row_counter+=1
@@ -358,6 +367,7 @@ while (run==True):
         screen.blit(depth7,depth7_rect)
         screen.blit(depth8,depth8_rect)
         screen.blit(depth9,depth9_rect)
+        screen.blit(inst,inst_rect)
         if player.pulse:  # Check if pulse object exists
             player.pulse.display()
         game_over=player.update(game_over)
@@ -373,7 +383,7 @@ while (run==True):
     level_rect.topleft = (250, 10)
     screen.blit(input_surface, input_rect)
     screen.blit(freq_surface, freq_rect)
-    screen.blit(level_surface, level_rect)
+    # screen.blit(level_surface, level_rect)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
@@ -398,6 +408,8 @@ while (run==True):
             else:
                 input_active3 = False
         if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                main_menu = True
             if event.key == pygame.K_r:
                 game_over = reset_game(player, world)
             if event.key == pygame.K_RETURN:
@@ -405,19 +417,19 @@ while (run==True):
                     rate_match = re.search(r'\d+', rate_input)
                     if rate_match:
                         rate = int(rate_match.group())
-                    rate_input = ""
+                    # rate_input = ""
                     input_active = False
                 if input_active2:
                     freq_match = re.search(r'\d+', freq_input)
                     if freq_match:
                         maxSize = int(freq_match.group())
-                    freq_input = ""
+                    # freq_input = ""
                     input_active2 = False
                 if input_active3:
                     level_match = re.search(r'\d+', level_input)
                     if level_match:
                         level = int(level_match.group())
-                    level_input = ""
+                    # level_input = ""
                     input_active3 = False
             if event.key == pygame.K_BACKSPACE:
                 if input_active:

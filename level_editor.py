@@ -26,6 +26,7 @@ Sand= pygame.image.load('Img/sand.png')
 Stone = pygame.image.load('Img/stone.png')
 save_img = pygame.image.load('img/save_btn.png')
 load_img = pygame.image.load('img/load_btn.png')
+fish1 = pygame.image.load('img/fishgolden.png')
 
 
 #define game variables
@@ -98,6 +99,10 @@ def draw_world():
 					img = pygame.transform.scale(Sand, (tile_size//18, tile_size))
 					img = pygame.transform.flip(img,True,False)
 					screen.blit(img, (col * tile_size + 48, row * tile_size))
+				if world_data[row][col]==8:
+					#Fish
+					img = pygame.transform.scale(fish1, (tile_size, tile_size))
+					screen.blit(img, (col * tile_size, row * tile_size))
 					
 
 class Button():
